@@ -148,6 +148,48 @@ int NTPClient::getMinutes() const {
 int NTPClient::getSeconds() const {
   return (this->getEpochTime() % 60);
 }
+int NTPClient::getYear() const {
+  unsigned long rawTime = this->getEpochTime();
+  int days = rawTime / 86400L;
+  int year = 1970;
+
+  while(days >= (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? 366 : 365) ) {
+    days -= year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? 366 : 365;
+    year++;
+  }
+
+  return year;
+}
+
+int NTPClient::getMonth() const {
+  unsigned long rawTime = this->getEpochTime();
+  int days = rawTime / 86400L;
+  int year = 1970;
+
+  while(days >= (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? 366 : 365) ) {
+    days -= year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? 366 : 365;
+    year++;
+  }
+
+  int monthLength = 0;
+  for(int i = 1; i <= 12; i++) {
+    if(i == 2) {
+      monthLength = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? 29 : 28;
+    } else if(i == 4 || i == 6 || i == 9 || i == 11) {
+      monthLength = 30;
+    } else {
+      monthLength = 31;
+    }
+
+    if(days < monthLength) {
+      return i;
+    }
+
+    days -= monthLength;
+  }
+
+  return 0;
+}
 
 String NTPClient::getFormattedTime() const {
   unsigned long rawTime = this->getEpochTime();
